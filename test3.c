@@ -187,8 +187,8 @@ int main()
         }
         else strcpy(command_second, "");
         
-        if(command_first == "read") {
-            if(command_second == "") {
+        if(strcmp(command_first, "read") == 0) {
+            if(strcmp(command_second, "") == 0) {
                 printf("error_no filename\n");
                 continue;
             }
@@ -244,12 +244,12 @@ int main()
 
         }
         
-        if(command_first == "list") {
+        if(strcmp(command_first, "list") == 0) {
             inorder(root);
         }
 
-        if(command_first == "find") {
-            if(command_second == "") {
+        if(strcmp(command_first, "find") == 0) {
+            if(strcmp(command_second, "") == 0) {
                 printf("error_no target\n");
                 continue;
             }
@@ -266,8 +266,8 @@ int main()
             printf("    %s\n", temp->per->email);
         }
         
-        if(command_first == "trace") {
-            if(command_second == "") {
+        if(strcmp(command_first, "trace") == 0) {
+            if(strcmp(command_second, "") == 0) {
                 printf("error_no target\n");
                 continue;
             }
@@ -277,16 +277,16 @@ int main()
             }
         }
         
-        if(command_first == "delete") {
-            if(command_second == "") {
+        if(strcmp(command_first, "delete") == 0) {
+            if(strcmp(command_second, "") == 0) {
                 printf("error_no target\n");
                 continue;
             }
             delete(root, command_second);
         }
 
-        if(command_first == "save") {
-            if(command_second == "") {
+        if(strcmp(command_first, "save") == 0) {
+            if(strcmp(command_second, "") == 0) {
                 printf("error_no filename\n");
                 continue;
             }
@@ -298,6 +298,6 @@ int main()
         }
         command[0] = '\0';
         command_second[0] = '\0';
-    } while(command_first != "exit");
+    } while(strcmp(command_first, "exit") != 0);
     return 0;
 }
