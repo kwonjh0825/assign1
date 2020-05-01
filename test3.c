@@ -71,10 +71,10 @@ Node* delete(Node* node, char* name)
     if (node == NULL) {
         return NULL;
     }
-    if (name < (node->per->name)) {
+    if (strcmp((node->per->name), name) > 0)  {
         node->left = delete(node->left, name);
     }
-    else if (name > (node->per->name)) {
+    else if (strcmp((node->per->name), name) < 0) {
         node->right = delete(node->right, name);
     }
 
@@ -104,11 +104,11 @@ void inorder(Node *node)
     }
     inorder(node->left);
     printf("%s\n", node->per->name);
-    printf("    %s\n", node->per->company);
-    printf("    %s\n", node->per->address);
-    printf("    %s\n", node->per->zipcode);
-    printf("    %s\n", node->per->phone);
-    printf("    %s\n", node->per->email);
+    printf("    Company: %s\n", node->per->company);
+    printf("    Address: %s\n", node->per->address);
+    printf("    Zipcode: %s\n", node->per->zipcode);
+    printf("    Phones: %s\n", node->per->phone);
+    printf("    Email: %s\n", node->per->email);
     inorder(node->right);
 }
 
@@ -126,8 +126,8 @@ Node* find(Node *node, char* name)
 
 Node* trace(Node* node, char* name)
 {
-    printf("%s ", node->per->name);
-    if(node == NULL || node->per->name == name) {
+    printf("%s\n", node->per->name);
+    if(node == NULL || strcmp(node->per->name, name) == 0) {
         return node;
     }
     if(strcmp(name, node->per->name) > 0) {
