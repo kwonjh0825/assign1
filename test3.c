@@ -2,17 +2,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define READ "read"
+#define LIST "list"
+#define FIND "find"
+#define TRACE "trace"
+#define DELETE "delete"
+#define SAVE "save"
+#define EXIT "exit"
 typedef struct personal {
-    char name[1000];
-    char company[1000];
-    char address[1000];
-    char zipcode[1000];
-    char phone[1000];
-    char email[1000];
+    char name[256];
+    char company[256];
+    char address[256];
+    char zipcode[256];
+    char phone[256];
+    char email[256];
 }personal;
 
 typedef struct Node {
-    struct personal *per;
+    personal *per;
     struct Node *left;
     struct Node *right;
 }Node;
@@ -49,11 +56,11 @@ Node* insert(Node *node, personal *p)
         temp->right = NULL;
         return temp;
     }
-    if(p->name > (node->per->name)) {
-        node->right = insert(node->right, p);
-    }
-    else if (p->name < (node->per->name)) {
+    if(strcmp(node->per->name, p->name) > 0) {
         node->left = insert(node->left, p);
+    }
+    else {
+        node->right = insert(node->right, p);
     }
     return node;
 }
@@ -107,17 +114,15 @@ void inorder(Node *node)
 
 Node* find(Node *node, char* name)
 {
-    if(node == NULL) {
-        return NULL;
+    if(node == NULL || strcmp(node->per->name, name) == 0) {
+        return node;
     }
-    if(name > node->per->name) {
-        return find(node->right, name);
-    }
-    else if(name < node->per->name) {
+    if(strcmp(node->per->name, name) > 0) {
         return find(node->left, name);
     }
-    else return node;
+    return find(node->right, name);
 }
+
 
 Node* trace(Node* node, char* name)
 {
@@ -153,15 +158,26 @@ void savefile(FILE* fp, Node* node)
     savefile(fp, node->right);
 }
 
+void clearnode(Node *node)
+{
+    if(node == NULL) {
+        return;
+    }
+    clearnode(node->left);
+    clearnode(node->right);
+    free(node);
+    free(node->per);
+}
+
 int main()
 {
-    FILE* fp=NULL;
-    Node* root=NULL;
-    Node* temp=NULL;
+    FILE *fp=NULL;
+    Node *root=NULL;
+    Node *temp=NULL;
     
-    char command[1000];
-    char command_first[1000];
-    char command_second[1000];
+    char command[100];
+    char command_first[100];
+    char command_second[100];
     char *p;
 
     int rowcount = 0;
@@ -187,44 +203,53 @@ int main()
         }
         else strcpy(command_second, "");
         
-        if(strcmp(command_first, "read") == 0) {
-            if(strcmp(command_second, "") == 0) {
+        if (strcmp(command_first, READ) == 0) {
+            if (strcmp(command_second, "") == 0) {
                 printf("error_no filename\n");
                 continue;
             }
             personal* m = NULL;
-            fp = fopen(command_second, "r");
-            if(fp != NULL) {
-                while(fgets(buffer, 1000, fp)) {
-                    rowcount++;
-                    if(rowcount == 1) {
-                        continue;
-                    }
-                    fieldcount == 0;
-                    i = 0;
+            
+            if (root != NULL) {
+                clearnode(root);
+                root = NULL;
+            }
 
-                    m = (personal *)malloc(sizeof(personal));
+            fp = fopen(command_second, "r");
+
+            if (fp != NULL) {
+                while (fgets(buffer, 1024, fp)) {
+                    rowcount++;
+
+                    if (rowcount == 1) continue;
+
+                    fieldcount = 0;
+                    i = 0;
+                    
+                    m = (personal*)malloc(sizeof(personal));
+
                     do {
                         token[tokenpos++] = buffer[i];
-                        if( !in_double_quotes && (buffer[i] == ',' || buffer[i] == '\n')) {
-                            token[tokenpos-1] = 0;
+
+                        if ( !in_double_quotes && (buffer[i] == ',' || buffer[i] == '\n') ) {
+                            token[tokenpos - 1] = 0;
                             tokenpos = 0;
 
                             if (fieldcount == 0) {
                                 strcpy(m->name, token);
-                            }
+                            } 
                             else if (fieldcount == 1) {
                                 strcpy(m->company, token);
                             }
                             else if (fieldcount == 2) {
                                 strcpy(m->address, token);
-                            }
+                            } 
                             else if (fieldcount == 3) {
                                 strcpy(m->zipcode, token);
-                            }
+                            } 
                             else if (fieldcount == 4) {
                                 strcpy(m->phone, token);
-                            }
+                            } 
                             else if (fieldcount == 5) {
                                 strcpy(m->email, token);
                             }
@@ -237,18 +262,18 @@ int main()
                         if (buffer[i] == '"' && buffer[i+1] == '"') {
                             i++;
                         }
-                    } while(buffer[++i]);
+                    } while (buffer[++i]);
+                    
                     root = insert(root, m);
                 }
-            }            
-
+            }
         }
         
-        if(strcmp(command_first, "list") == 0) {
+        if(strcmp(command_first, LIST) == 0) {
             inorder(root);
         }
 
-        if(strcmp(command_first, "find") == 0) {
+        if(strcmp(command_first, FIND) == 0) {
             if(strcmp(command_second, "") == 0) {
                 printf("error_no target\n");
                 continue;
@@ -266,7 +291,7 @@ int main()
             printf("    %s\n", temp->per->email);
         }
         
-        if(strcmp(command_first, "trace") == 0) {
+        if(strcmp(command_first, TRACE) == 0) {
             if(strcmp(command_second, "") == 0) {
                 printf("error_no target\n");
                 continue;
@@ -277,7 +302,7 @@ int main()
             }
         }
         
-        if(strcmp(command_first, "delete") == 0) {
+        if(strcmp(command_first, DELETE) == 0) {
             if(strcmp(command_second, "") == 0) {
                 printf("error_no target\n");
                 continue;
@@ -285,7 +310,7 @@ int main()
             delete(root, command_second);
         }
 
-        if(strcmp(command_first, "save") == 0) {
+        if(strcmp(command_first, SAVE) == 0) {
             if(strcmp(command_second, "") == 0) {
                 printf("error_no filename\n");
                 continue;
@@ -298,6 +323,6 @@ int main()
         }
         command[0] = '\0';
         command_second[0] = '\0';
-    } while(strcmp(command_first, "exit") != 0);
+    } while(strcmp(command_first, EXIT) != 0);
     return 0;
 }
